@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <!-- The stroke is the line that surrounds the object, whereas
+    the solid is the fill -->
+    <stroke android:width="5dp"
+        android:color="@color/colorAccent"/>
+    <solid android:color="@color/colorWhite" />
+
+</shape>
