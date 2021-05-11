@@ -1,5 +1,7 @@
 package com.nickmonks.a7minuteworkout
 
+import android.app.Dialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -9,6 +11,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_exercise.*
+import kotlinx.android.synthetic.main.dialog_custom_back_confirmation.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -19,7 +22,9 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private var exerciseTimer : CountDownTimer? = null
     private var exerciseProgress = 0
-    private var exerciseTimerDuration: Long = 30
+
+    private var exerciseTimerDuration: Long = 1
+    private var restTimerDuration: Long = 1
 
     private var exerciseList : ArrayList<ExerciseModel>? = null
     private var currentExercisePosition = -1
@@ -42,7 +47,8 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         // In case the user press the back button, to avoid going back
         toolbar_exercise_activity.setNavigationOnClickListener{
-            onBackPressed()
+            // this opens the dialog created in the class
+            customDialogForBackButton()
         }
 
         // Set up the text to speech detector:
@@ -88,12 +94,12 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private fun setRestProgressBar() {
         progressBar.progress = restProgress
         // the timer is an anonymous object class, which is declared as shown in kotlin
-        restTimer = object : CountDownTimer(10000, 1000) {
+        restTimer = object : CountDownTimer(restTimerDuration * 1000, 1000) {
             override fun onTick(p0: Long) {
 
-                progressBar.progress = 10 - restProgress
+                progressBar.progress = restTimerDuration.toInt() - restProgress
                 // update the textview
-                tvTimer.text = (10- restProgress).toString()
+                tvTimer.text = (restTimerDuration.toInt()- restProgress).toString()
 
                 // update the progress bar
                 restProgress++
@@ -121,7 +127,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private fun setExerciseProgressBar() {
         progressBarExercise.progress = exerciseProgress
         // the timer is an anonymous object class, which is declared as shown in kotlin
-        exerciseTimer = object : CountDownTimer(30000, 1000) {
+        exerciseTimer = object : CountDownTimer(exerciseTimerDuration*1000, 1000) {
             override fun onTick(p0: Long) {
                 // update the progress bar
                 exerciseProgress++
@@ -144,7 +150,10 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                     // switch to rest view
                     setupRestView()
                 }else{
-                    // When the exercise is finished, we will set that data has changed
+                    // When the exercise is finished completely, we close this activity and move to next one
+                    finish()
+                    val intent : Intent = Intent(this@ExerciseActivity, FinishActivity::class.java)
+                    startActivity(intent)
                 }
             }
 
@@ -213,5 +222,25 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         // set up the recyclerview
         rvExerciseStatus.adapter = exerciseAdapter
+    }
+
+
+    private fun customDialogForBackButton(){
+        val custom_dialog = Dialog(this)
+
+        custom_dialog.setContentView(R.layout.dialog_custom_back_confirmation)
+
+        // once the yes button is pressed...
+        custom_dialog.tvYes.setOnClickListener {
+            finish()
+            custom_dialog.dismiss()
+        }
+
+        custom_dialog.tvNo.setOnClickListener {
+            custom_dialog.dismiss()
+        }
+
+        // DOnt forget to show!
+        custom_dialog.show()
     }
 }
