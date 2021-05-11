@@ -99,6 +99,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar_exercise_activity"
         android:gravity="center"
+        android:layout_marginBottom="40dp"
         android:orientation="vertical"
         android:visibility="gone"
         tools:visibility="visible">
@@ -107,8 +108,8 @@
             android:id="@+id/ivImage"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:scaleType="fitXY"
             android:layout_weight="1"
+
             android:contentDescription="@string/image"
             android:src="@drawable/ic_jumping_jacks"
             />
@@ -160,5 +161,15 @@
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>
+
+    <!-- Recycler view for status: ONGOING, FINISH...-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvExerciseStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="5dp"
+        />
 
 </RelativeLayout>

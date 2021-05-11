@@ -7,6 +7,7 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_exercise.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -24,6 +25,9 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var currentExercisePosition = -1
 
     private var tts: TextToSpeech? = null
+
+    private var exerciseAdapter : ExerciseStatusAdapter? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +54,9 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         // Set up the timer
         setupRestView()
+
+        // set up the recycler view
+        setupExeciseStatusRecyclerView()
 
 
     }
@@ -95,6 +102,14 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             override fun onFinish() {
                 // set the exercise
                  currentExercisePosition++
+
+                // set the complete circle in the 7 minute workout app
+                exerciseList!![currentExercisePosition].setIsSelected(true)
+
+                // As soon as the data ahs changed, the adapter as a method to notify it that there is a change
+                // this will notify all the observers
+                exerciseAdapter!!.notifyDataSetChanged()
+
                 // What is executed once the timer is over
                 setupExerciseView()
             }
@@ -117,10 +132,19 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
             override fun onFinish() {
                 // What is executed once the timer is over
+
                 if (currentExercisePosition < exerciseList?.size!! -1){
+                    // we will notify to the adapter that the data has changed : the exercise
+                    // is completed and is not selected anymore
+
+                    exerciseList!![currentExercisePosition].setIsSelected(false)
+                    exerciseList!![currentExercisePosition].setIsCompleted(true)
+                    exerciseAdapter!!.notifyDataSetChanged()
+
+                    // switch to rest view
                     setupRestView()
                 }else{
-                    // When the exercise is finished...
+                    // When the exercise is finished, we will set that data has changed
                 }
             }
 
@@ -177,5 +201,17 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private fun speakOut(text: String){
         tts!!.speak(text,TextToSpeech.QUEUE_FLUSH, null, "")
+    }
+
+    private fun setupExeciseStatusRecyclerView(){
+        // We need to set up the manager of the recyclerview - How do we want to display them
+        // In our case want a linear layout
+        rvExerciseStatus.layoutManager = LinearLayoutManager(this,
+            LinearLayoutManager.HORIZONTAL, false)
+
+        exerciseAdapter = ExerciseStatusAdapter(exerciseList!!, this)
+
+        // set up the recyclerview
+        rvExerciseStatus.adapter = exerciseAdapter
     }
 }
